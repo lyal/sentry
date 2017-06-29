@@ -1,6 +1,7 @@
 import React from 'react';
 import Reflux from 'reflux';
 import ApiMixin from '../../mixins/apiMixin';
+import TooltipMixin from '../../mixins/tooltip';
 import ActionLink from './actionLink';
 import DropdownLink from '../../components/dropdownLink';
 import Duration from '../../components/duration';
@@ -60,13 +61,13 @@ const IgnoreActions = React.createClass({
     let extraDescription = null;
     if (this.state.allInQuerySelected) {
       extraDescription = this.props.query
-        ? (<div>
+        ? <div>
             <p>{t('This will apply to the current search query:')}</p>
             <pre>{this.props.query}</pre>
-          </div>)
-        : (<p className="error">
+          </div>
+        : <p className="error">
             <strong>{t('This will apply to ALL issues in this project!')}</strong>
-          </p>);
+          </p>;
     }
     let linkClassName = 'group-ignore btn btn-default btn-sm';
     let actionLinkProps = {
@@ -381,6 +382,16 @@ const StreamActions = React.createClass({
 
   mixins: [
     ApiMixin,
+    TooltipMixin({
+      selector: '.tip',
+      placement: 'bottom',
+      container: 'body',
+      constraints: [
+        {
+          attachment: 'together'
+        }
+      ]
+    }),
     Reflux.listenTo(SelectedGroupStore, 'onSelectedGroupChange'),
     PureRenderMixin
   ],
@@ -398,6 +409,14 @@ const StreamActions = React.createClass({
       pageSelected: false, // all on current page selected (e.g. 25)
       allInQuerySelected: false // all in current search query selected (e.g. 1000+)
     };
+  },
+
+  componentWillReceiveProps({realtimeActive}) {
+    // Need to re-attach tooltips
+    if (this.props.realtimeActive !== realtimeActive) {
+      this.removeTooltips();
+      this.attachTooltips();
+    }
   },
 
   selectAll() {
@@ -514,13 +533,13 @@ const StreamActions = React.createClass({
     let extraDescription = null;
     if (this.state.allInQuerySelected) {
       extraDescription = this.props.query
-        ? (<div>
+        ? <div>
             <p>{t('This will apply to the current search query:')}</p>
             <pre>{this.props.query}</pre>
-          </div>)
-        : (<p className="error">
+          </div>
+        : <p className="error">
             <strong>{t('This will apply to ALL issues in this project!')}</strong>
-          </p>);
+          </p>;
     }
 
     return (
@@ -722,8 +741,14 @@ const StreamActions = React.createClass({
                 className="btn btn-default btn-sm hidden-xs realtime-control"
                 onClick={this.onRealtimeChange}>
                 {this.props.realtimeActive
-                  ? <span className="icon icon-pause" />
-                  : <span className="icon icon-play" />}
+                  ? <span
+                      className="icon icon-pause tip"
+                      title="Pause real-time updates"
+                    />
+                  : <span
+                      className="icon icon-play tip"
+                      title="Enable real-time updates"
+                    />}
               </a>
             </div>
           </div>
