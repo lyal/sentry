@@ -211,7 +211,7 @@ describe('Stream', function() {
       expect(wrapper.state('realtimeActive')).toBe(false);
     });
 
-    it('has "play" (live events) button enabled when there are no events', function() {
+    it('has real time event updates enabled when there are no events', function() {
       let wrapper = shallow(<Stream {...this.wrapper.instance().props} />, {
         context: {
           ...this.context,
@@ -230,7 +230,6 @@ describe('Stream', function() {
       });
 
       expect(wrapper.state('realtimeActive')).toBe(true);
-      expect(wrapper).toMatchSnapshot();
     });
   });
 
